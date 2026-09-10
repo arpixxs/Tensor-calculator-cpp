@@ -16,16 +16,27 @@ A small N-dimensional tensor library and interactive calculator written in moder
 ```
 tensor-calculator-cpp/
 ├── README.md
-├── include/
-│   └── Tensor.hpp      # Core tensor class (storage + operations)
-    └── main.cpp        # Interactive CLI calculator
+├── Tensor.hpp      # Core tensor class (storage + operations)
+└── main.cpp        # Interactive CLI calculator
 ```
 
 ## Build
 
-Requires a C++17 compiler (g++, clang++, etc.).
+Requires a C++17 compiler (g++, clang++, etc.). Both files live in the same
+directory, so no include-path flags are needed.
 
- a menu-driven calculator:
+```bash
+g++ -std=c++17 -O2 -Wall -o tensor_calculator main.cpp
+```
+
+This produces an executable named `tensor_calculator` (add `.exe` on Windows).
+Run it with:
+
+```bash
+./tensor_calculator
+```
+
+Running the program launches a menu-driven calculator:
 
 ```
 ===== Tensor Calculator =====
