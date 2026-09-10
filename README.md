@@ -1,4 +1,4 @@
-# tensor-calculator
+# Tensor-calculator-cpp
 
 A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17)
 
