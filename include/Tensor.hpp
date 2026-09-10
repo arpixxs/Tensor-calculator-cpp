@@ -7,11 +7,11 @@
 #include <iostream>
 #include <iomanip>
 
-// A simple N-dimensional tensor backed by a flat std::vector<double>.
+// N-dimensional tensor, flat vector<double> underneath.
 class Tensor {
 public:
     std::vector<size_t> shape;   // e.g. {2,3} = 2x3 matrix
-    std::vector<double> data;    // flattened row-major storage
+    std::vector<double> data;    // row-major
 
     Tensor() = default;
 
@@ -21,7 +21,7 @@ public:
     Tensor(const std::vector<size_t>& shape_, std::vector<double> data_)
         : shape(shape_), data(std::move(data_)) {
         if (data.size() != numel(shape))
-            throw std::invalid_argument("Data size does not match shape");
+            throw std::invalid_argument("data/shape size mismatch");
     }
 
     static size_t numel(const std::vector<size_t>& shape_) {
@@ -32,8 +32,8 @@ public:
     size_t size() const { return data.size(); }
     size_t rank() const { return shape.size(); }
 
-    // Strides for row-major layout.
     std::vector<size_t> strides() const {
+        // row-major, so the last dim has stride 1 and it builds up from there
         std::vector<size_t> s(shape.size(), 1);
         for (int i = (int)shape.size() - 2; i >= 0; --i)
             s[i] = s[i + 1] * shape[i + 1];
@@ -42,12 +42,12 @@ public:
 
     size_t flatten_index(const std::vector<size_t>& idx) const {
         if (idx.size() != shape.size())
-            throw std::invalid_argument("Index rank mismatch");
+            throw std::invalid_argument("wrong number of indices for this tensor's rank");
         auto s = strides();
         size_t flat = 0;
         for (size_t i = 0; i < idx.size(); ++i) {
             if (idx[i] >= shape[i])
-                throw std::out_of_range("Index out of range");
+                throw std::out_of_range("index out of range");
             flat += idx[i] * s[i];
         }
         return flat;
@@ -56,16 +56,16 @@ public:
     double& at(const std::vector<size_t>& idx) { return data[flatten_index(idx)]; }
     double at(const std::vector<size_t>& idx) const { return data[flatten_index(idx)]; }
 
-    // ---- Element-wise binary ops (broadcasting a scalar tensor is supported) ----
+    // handles A+B elementwise, plus a hack for broadcasting a single scalar tensor
+    // (shape {1}) against anything else. doesn't handle general broadcasting.
     Tensor elementwise(const Tensor& other, const std::function<double(double,double)>& op) const {
         if (other.shape.size() == 1 && other.shape[0] == 1) {
-            // broadcast scalar-like tensor
             Tensor result(shape);
             for (size_t i = 0; i < data.size(); ++i) result.data[i] = op(data[i], other.data[0]);
             return result;
         }
         if (shape != other.shape)
-            throw std::invalid_argument("Shape mismatch for element-wise operation");
+            throw std::invalid_argument("shapes don't match");
         Tensor result(shape);
         for (size_t i = 0; i < data.size(); ++i) result.data[i] = op(data[i], other.data[i]);
         return result;
@@ -82,13 +82,13 @@ public:
         return result;
     }
 
-    // ---- Matrix multiplication (rank-2 only) ----
+    // only does 2D x 2D, didn't need anything fancier for this
     Tensor matmul(const Tensor& other) const {
         if (rank() != 2 || other.rank() != 2)
-            throw std::invalid_argument("matmul requires two 2D tensors");
+            throw std::invalid_argument("matmul only works on 2D tensors");
         size_t n = shape[0], k = shape[1], k2 = other.shape[0], m = other.shape[1];
         if (k != k2)
-            throw std::invalid_argument("Inner dimensions must match for matmul");
+            throw std::invalid_argument("inner dimensions don't match");
         Tensor result({n, m});
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = 0; j < m; ++j) {
@@ -101,10 +101,9 @@ public:
         return result;
     }
 
-    // ---- Transpose (rank-2 only) ----
     Tensor transpose() const {
         if (rank() != 2)
-            throw std::invalid_argument("transpose implemented for 2D tensors only");
+            throw std::invalid_argument("transpose only works on 2D for now");
         Tensor result({shape[1], shape[0]});
         for (size_t i = 0; i < shape[0]; ++i)
             for (size_t j = 0; j < shape[1]; ++j)
@@ -112,12 +111,10 @@ public:
         return result;
     }
 
-    // ---- Reshape (same total element count) ----
     Tensor reshape(const std::vector<size_t>& new_shape) const {
         if (numel(new_shape) != data.size())
-            throw std::invalid_argument("Reshape must preserve element count");
-        Tensor result(new_shape, data);
-        return result;
+            throw std::invalid_argument("reshape can't change the total number of elements");
+        return Tensor(new_shape, data);
     }
 
     double sum() const {
@@ -128,16 +125,14 @@ public:
 
     double mean() const { return data.empty() ? 0.0 : sum() / data.size(); }
 
-    // Dot product for two rank-1 tensors of equal length.
     double dot(const Tensor& other) const {
         if (rank() != 1 || other.rank() != 1 || shape[0] != other.shape[0])
-            throw std::invalid_argument("dot requires two 1D tensors of equal length");
+            throw std::invalid_argument("dot needs two 1D tensors of the same length");
         double s = 0.0;
         for (size_t i = 0; i < shape[0]; ++i) s += data[i] * other.data[i];
         return s;
     }
 
-    // ---- Pretty printing ----
     std::string to_string() const {
         std::ostringstream oss;
         oss << std::fixed << std::setprecision(4);
@@ -148,7 +143,7 @@ public:
     void print() const { std::cout << to_string() << std::endl; }
 
 private:
-    // Recursively formats nested brackets according to shape.
+    // builds up the nested [ ] formatting one dimension at a time
     void print_recursive(std::ostringstream& oss, size_t dim, size_t offset, size_t count) const {
         if (dim == shape.size()) {
             oss << data[offset];
