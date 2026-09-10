@@ -103,6 +103,3 @@ Tensor t = a.transpose();
 sum.print();
 ```
 
-
-
-MIT (or your choice — add a `LICENSE` file before publishing).
