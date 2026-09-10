@@ -1,6 +1,6 @@
-# tensor-calculator-cpp
+# tensor-calculator
 
-A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17) 
+A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17)
 
 ## Features
 
@@ -18,7 +18,6 @@ tensor-calculator-cpp/
 ├── README.md
 ├── include/
 │   └── Tensor.hpp      # Core tensor class (storage + operations)
-└── src/
     └── main.cpp        # Interactive CLI calculator
 ```
 
@@ -26,17 +25,7 @@ tensor-calculator-cpp/
 
 Requires a C++17 compiler (g++, clang++, etc.).
 
-```bash
-g++ -std=c++17 -O2 -Wall -Iinclude -o tensor_calc src/main.cpp
-```
-
-## Run
-
-```bash
-./tensor_calc
-```
-
-You'll get a menu-driven calculator:
+ a menu-driven calculator:
 
 ```
 ===== Tensor Calculator =====
@@ -103,6 +92,6 @@ Tensor t = a.transpose();
 sum.print();
 ```
 
-## License
+
 
 MIT (or your choice — add a `LICENSE` file before publishing).
