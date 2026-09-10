@@ -25,8 +25,8 @@ Tensor read_tensor(const std::string& label)
     return Tensor(shape, values);
 }
 
-void print_menu() 
-{
+void print_menu()
+ {
     std::cout << "\n===== Tensor Calculator =====\n"
               << " 1. Create/store a tensor\n"
               << " 2. Print a stored tensor\n"
