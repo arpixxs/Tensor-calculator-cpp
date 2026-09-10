@@ -22,9 +22,6 @@ tensor-calculator-cpp/
     └── main.cpp        # Interactive CLI calculator
 ```
 
-> Note: `Tensor.hpp` has no dependency on `main.cpp`, so it can be dropped into
-> any other C++ project and used as a standalone tensor library.
-
 ## Build
 
 Requires a C++17 compiler (g++, clang++, etc.).
