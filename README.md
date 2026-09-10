@@ -1,6 +1,6 @@
 # tensor-calculator-cpp
 
-A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17), with no external dependencies.
+A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17) 
 
 ## Features
 
@@ -105,13 +105,6 @@ Tensor t = a.transpose();
 
 sum.print();
 ```
-
-## Roadmap / ideas
-
-- [ ] Broadcasting for matmul beyond 2D
-- [ ] Expression parser (e.g. `A + B * 2`) instead of menu-driven input
-- [ ] Save/load tensors to/from file
-- [ ] Unit tests (e.g. with Catch2 or GoogleTest)
 
 ## License
 
