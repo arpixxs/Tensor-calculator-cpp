@@ -82,7 +82,7 @@ public:
         return result;
     }
 
-    // only does 2D x 2D, didn't need anything fancier for this
+    // only does 2D x 2D (standard matrix multiplication), didn't need anything fancier for this
     Tensor matmul(const Tensor& other) const {
         if (rank() != 2 || other.rank() != 2)
             throw std::invalid_argument("matmul only works on 2D tensors");
