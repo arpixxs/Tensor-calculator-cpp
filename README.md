@@ -19,10 +19,6 @@ tensor-calculator-cpp/
 ├── Tensor.hpp      # Core tensor class (storage + operations)
 └── main.cpp        # Interactive CLI calculator
 ```
-## License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) 
-## Build
 
 Requires a C++17 compiler (g++, clang++, etc.). Both files live in the same
 directory, so no include-path flags are needed.
@@ -105,3 +101,7 @@ Tensor t = a.transpose();
 sum.print();
 ```
 
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) 
+## Build
