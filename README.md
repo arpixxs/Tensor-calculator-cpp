@@ -16,7 +16,7 @@ A small N-dimensional tensor library and interactive calculator written in moder
 ```
 tensor-calculator-cpp/
 ├── README.md
-├── Tensor.hpp      # Core tensor class (storage + operations)
+├── Tensor.hpp      # Core tensor class 
 └── main.cpp        # Interactive CLI calculator
 ```
 
