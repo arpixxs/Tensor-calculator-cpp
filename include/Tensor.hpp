@@ -57,11 +57,20 @@ public:
     double at(const std::vector<size_t>& idx) const { return data[flatten_index(idx)]; }
 
     // handles A+B elementwise, plus a hack for broadcasting a single scalar tensor
-    // (shape {1}) against anything else. doesn't handle general broadcasting.
+    // (shape {1}) against anything else. works with the scalar on either side.
+    // doesn't handle general broadcasting.
     Tensor elementwise(const Tensor& other, const std::function<double(double,double)>& op) const {
-        if (other.shape.size() == 1 && other.shape[0] == 1) {
+        bool this_is_scalar = shape.size() == 1 && shape[0] == 1;
+        bool other_is_scalar = other.shape.size() == 1 && other.shape[0] == 1;
+
+        if (other_is_scalar && !this_is_scalar) {
             Tensor result(shape);
             for (size_t i = 0; i < data.size(); ++i) result.data[i] = op(data[i], other.data[0]);
+            return result;
+        }
+        if (this_is_scalar && !other_is_scalar) {
+            Tensor result(other.shape);
+            for (size_t i = 0; i < other.data.size(); ++i) result.data[i] = op(data[0], other.data[i]);
             return result;
         }
         if (shape != other.shape)
@@ -75,6 +84,15 @@ public:
     Tensor operator-(const Tensor& o) const { return elementwise(o, std::minus<double>()); }
     Tensor operator*(const Tensor& o) const { return elementwise(o, std::multiplies<double>()); }
     Tensor operator/(const Tensor& o) const { return elementwise(o, std::divides<double>()); }
+    Tensor operator-() const { return scale(-1.0); }
+
+    Tensor& operator+=(const Tensor& o) { *this = elementwise(o, std::plus<double>()); return *this; }
+    Tensor& operator-=(const Tensor& o) { *this = elementwise(o, std::minus<double>()); return *this; }
+    Tensor& operator*=(const Tensor& o) { *this = elementwise(o, std::multiplies<double>()); return *this; }
+    Tensor& operator/=(const Tensor& o) { *this = elementwise(o, std::divides<double>()); return *this; }
+
+    bool operator==(const Tensor& o) const { return shape == o.shape && data == o.data; }
+    bool operator!=(const Tensor& o) const { return !(*this == o); }
 
     Tensor scale(double k) const {
         Tensor result(shape);
@@ -90,12 +108,15 @@ public:
         if (k != k2)
             throw std::invalid_argument("inner dimensions don't match");
         Tensor result({n, m});
+        // index the flat buffers directly here (row-major, so row i starts at i*k) -
+        // going through at() per element would recompute+allocate a strides vector
+        // for every single multiply, which gets brutally slow on anything but toy sizes.
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = 0; j < m; ++j) {
                 double sum = 0.0;
                 for (size_t p = 0; p < k; ++p)
-                    sum += at({i, p}) * other.at({p, j});
-                result.at({i, j}) = sum;
+                    sum += data[i * k + p] * other.data[p * m + j];
+                result.data[i * m + j] = sum;
             }
         }
         return result;
@@ -104,10 +125,11 @@ public:
     Tensor transpose() const {
         if (rank() != 2)
             throw std::invalid_argument("transpose only works on 2D for now");
-        Tensor result({shape[1], shape[0]});
-        for (size_t i = 0; i < shape[0]; ++i)
-            for (size_t j = 0; j < shape[1]; ++j)
-                result.at({j, i}) = at({i, j});
+        size_t rows = shape[0], cols = shape[1];
+        Tensor result({cols, rows});
+        for (size_t i = 0; i < rows; ++i)
+            for (size_t j = 0; j < cols; ++j)
+                result.data[j * rows + i] = data[i * cols + j];
         return result;
     }
 
@@ -141,6 +163,10 @@ public:
     }
 
     void print() const { std::cout << to_string() << std::endl; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Tensor& t) {
+        return os << t.to_string();
+    }
 
 private:
     // builds up the nested [ ] formatting one dimension at a time
