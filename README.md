@@ -27,14 +27,14 @@ needed. If you drop `Tensor.hpp` into a different directory, either compile
 with `-I/path/to/that/directory` or update the `#include` to point at it.
 
 ```bash
-g++ -std=c++17 -O2 -Wall -o tensor_calculator main.cpp
+g++ -std=c++17 -O2 -Wall -o tensor-calculator main.cpp
 ```
 
 This produces an executable named `tensor_calculator` (add `.exe` on Windows).
 Run it with:
 
 ```bash
-./tensor_calculator
+./tensor-calculator
 ```
 
 Running the program launches a menu-driven calculator:
