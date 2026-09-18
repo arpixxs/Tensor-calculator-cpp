@@ -5,10 +5,11 @@ A small N-dimensional tensor library and interactive calculator written in moder
 ## Features
 
 - N-dimensional `Tensor` class backed by a flat `std::vector<double>`
-- Element-wise `+`, `-`, `*`, `/` (with scalar broadcasting)
+- Element-wise `+`, `-`, `*`, `/`, unary `-`, and `+=`/`-=`/`*=`/`/=` (with scalar broadcasting in either direction)
+- `==` / `!=` for comparing tensors
 - Matrix multiplication and transpose (2D)
 - Reshape, sum, mean, and dot product
-- Nested-bracket pretty printing
+- Nested-bracket pretty printing, including `operator<<` for direct streaming
 - Interactive CLI: create named tensors and combine them by name
 
 ## Project structure
@@ -16,12 +17,14 @@ A small N-dimensional tensor library and interactive calculator written in moder
 ```
 tensor-calculator-cpp/
 ├── README.md
-├── Tensor.hpp      # Core tensor class 
+├── Tensor.hpp      # Core tensor class (header-only, path: ./Tensor.hpp)
 └── main.cpp        # Interactive CLI calculator
 ```
 
 Requires a C++17 compiler (g++, clang++, etc.). Both files live in the same
-directory, so no include-path flags are needed.
+directory, so `#include "Tensor.hpp"` resolves with no include-path flags
+needed. If you drop `Tensor.hpp` into a different directory, either compile
+with `-I/path/to/that/directory` or update the `#include` to point at it.
 
 ```bash
 g++ -std=c++17 -O2 -Wall -o tensor_calculator main.cpp
@@ -88,8 +91,11 @@ Result:
 
 ## Using `Tensor.hpp` as a library
 
+`Tensor.hpp` is header-only — just include it from wherever it lives
+relative to your source file:
+
 ```cpp
-#include "Tensor.hpp"
+#include "Tensor.hpp"   // path relative to this .cpp, e.g. ./Tensor.hpp
 
 Tensor a({2, 2}, {1, 2, 3, 4});
 Tensor b({2, 2}, {5, 6, 7, 8});
@@ -98,9 +104,23 @@ Tensor sum = a + b;
 Tensor product = a.matmul(b);
 Tensor t = a.transpose();
 
+a += b;              // compound assignment
+Tensor neg = -a;      // unary minus
+bool same = (a == b); // element-wise equality
+
 sum.print();
+std::cout << product << std::endl;   // operator<< works too
 ```
+
+Compile any program that includes it the normal way:
+
+```bash
+g++ -std=c++17 -O2 -Wall -o my_program my_program.cpp
+```
+
+No extra flags are needed as long as `Tensor.hpp` is in the same directory
+or on your include path (see [Project structure](#project-structure)).
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) 
+This project is licensed under the MIT License — see the [LICENSE](LICENSE)
