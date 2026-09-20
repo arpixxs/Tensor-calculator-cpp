@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <type_traits>
 #include <utility>
+#include <limits>
 
 // N-dimensional tensor, flat vector<T> underneath.
 // T is the element type and defaults to double, so Tensor<> is the same as
@@ -33,11 +34,17 @@ public:
         if (data.size() != numel(shape))
             throw std::invalid_argument("data/shape size mismatch");
     }
-
-    static size_t numel(const std::vector<size_t>& shape_) {
-        return std::accumulate(shape_.begin(), shape_.end(),
-                                (size_t)1, std::multiplies<size_t>());
+  static size_t numel(const std::vector<size_t>& shape_) {
+    for (size_t d : shape_) if (d == 0) return 0;
+    size_t n = 1;
+    for (size_t d : shape_) {
+        if (n > std::numeric_limits<size_t>::max() / d)
+            throw std::length_error("tensor shape is too large");
+        n *= d;
     }
+    return n;
+}
+    
 
     size_t size() const { return data.size(); }
     size_t rank() const { return shape.size(); }
@@ -200,11 +207,14 @@ private:
     // int / 0 is undefined behaviour (usually a crash), so throw for the integer types.
     // doubles/floats just give inf/nan like normal.
     static T divide(T a, T b) {
-        if constexpr (std::is_integral<T>::value) {
-            if (b == 0) throw std::domain_error("integer division by zero");
-        }
-        return a / b;
+    if constexpr (std::is_integral<T>::value) {
+        if (b == 0) throw std::domain_error("integer division by zero");
+        if constexpr (std::is_signed<T>::value)                    // <-- add these 3 lines
+            if (b == T(-1) && a == std::numeric_limits<T>::min())
+                throw std::overflow_error("integer division overflow");
     }
+    return a / b;
+}
 
     Tensor& elementwise_inplace(const Tensor& other, const std::function<T(T,T)>& op) {
         Tensor result = elementwise(other, op);

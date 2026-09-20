@@ -2,9 +2,10 @@
 #include <iostream>
 #include <sstream>
 #include <type_traits>
+#include <limits>
 
-// tiny test setup so there's nothing to install. CHECK prints the line that failed
-// and keeps going, main returns non-zero at the end if anything went wrong.
+// tiny test setup 
+//  main returns non-zero at the end if anything went wrong.
 static int failures = 0;
 
 #define CHECK(cond) \
@@ -37,6 +38,11 @@ void test_construction()
 
     Tensord empty;
     CHECK(empty.size() == 0);
+
+    // a shape whose element count overflows size_t must throw, not wrap around
+    size_t big = (size_t)1 << 32;
+    CHECK_THROWS(Tensord({big, big}), std::length_error);
+    CHECK(Tensord({0, 3}).size() == 0);   // a zero dimension is still fine
 }
 
 void test_indexing()
@@ -174,7 +180,11 @@ void test_int_tensors()
     CHECK(a / Tensori({2}, {2, 2}) == Tensori({2}, {3, 4}));      // integer division
     CHECK_THROWS(a / Tensori({2}, {2, 0}), std::domain_error);    // would crash otherwise
     CHECK_THROWS(a / Tensori({1}, {0}), std::domain_error);
-    Tensori b = a;
+        CHECK_THROWS(a / Tensori({1}, {0}), std::domain_error);
+    CHECK_THROWS(Tensori({1}, {std::numeric_limits<int>::min()}) / Tensori({1}, {-1}),
+                 std::overflow_error); 
+    
+  Tensori b = a;
     CHECK_THROWS(b /= Tensori({2}, {0, 1}), std::domain_error);
     CHECK(b == a);   // failed /= leaves it untouched
 
