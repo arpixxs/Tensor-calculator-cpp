@@ -1,4 +1,4 @@
-# Tensor-calculator-cpp
+# Tensor-library-cpp
 
 A small, header-only N-dimensional tensor library written in modern C++ (C++17), plus an interactive command-line calculator built on top of it. No dependencies, just drop `Tensor.hpp` into your project.
 
@@ -28,7 +28,7 @@ std::cout << a.matmul(b) << std::endl;
 ## Project structure
 
 ```
-tensor-calculator-cpp/
+tensor-library-cpp/
 ├── README.md
 ├── LICENSE
 ├── CMakeLists.txt
@@ -43,23 +43,23 @@ tensor-calculator-cpp/
 
 ## Getting started
 
-Requires a C++17 compiler (g++, clang++, etc.). Both files are in the same folder, so `#include "Tensor.hpp"` works with no include-path flags.
+Requires a C++17 compiler (g++, clang++, etc) Both files are in the same folder, so `#include "Tensor.hpp"` works with no include-path flags.
 
 **With g++ / clang++:**
 
 ```bash
-g++ -std=c++17 -O2 -Wall -o tensor-calculator main.cpp
-./tensor-calculator
+g++ -std=c++17 -O2 -Wall -o tensor-library main.cpp
+./tensor-library
 ```
 
-(on Windows the executable is `tensor-calculator.exe`)
+(on Windows the executable is `tensor-library.exe`)
 
 **With CMake:**
 
 ```bash
 cmake -S . -B build
 cmake --build build
-./build/tensor-calculator
+./build/tensor-library
 ```
 
 **Run the tests:**
@@ -96,8 +96,7 @@ Running the program starts a menu-driven calculator:
 13. List stored tensors
  0. Exit
 ```
-
-Tensors are created by name and then referenced by that name in later operations, so you can build up a small workspace and chain operations. Any operation that produces a tensor asks if you want to save it; just press Enter to skip. The calculator works with `double` values.
+ The calculator works with `double` values.
 
 ### Example session
 
