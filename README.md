@@ -1,9 +1,5 @@
 # Tensor-calculator-cpp
 
-![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
-![header-only](https://img.shields.io/badge/header--only-yes-brightgreen.svg)
-![license](https://img.shields.io/badge/license-MIT-yellow.svg)
-
 A small, header-only N-dimensional tensor library written in modern C++ (C++17), plus an interactive command-line calculator built on top of it. No dependencies, just drop `Tensor.hpp` into your project.
 
 ```cpp
@@ -28,6 +24,22 @@ std::cout << a.matmul(b) << std::endl;
 - Clear exceptions for bad shapes, bad indices and integer division by zero
 - Interactive CLI: create named tensors and combine them by name
 - Unit tests included (no test framework needed)
+
+## Project structure
+
+```
+tensor-calculator-cpp/
+├── README.md
+├── LICENSE
+├── CMakeLists.txt
+├── Tensor.hpp              # the tensor class (header-only)
+├── main.cpp                # interactive CLI calculator
+├── tests/
+│   └── test_tensor.cpp     # unit tests
+└── .github/workflows/
+    └── ci.yml              # builds + runs tests on Linux and macOS
+```
+
 
 ## Getting started
 
@@ -204,31 +216,5 @@ s = s + x;            // this is fine, it just makes a new tensor
 - **`T` must be a number type** (checked at compile time). `bool` isn't supported.
 - Integer overflow isn't checked.
 
-## Project structure
-
-```
-tensor-calculator-cpp/
-├── README.md
-├── LICENSE
-├── CMakeLists.txt
-├── Tensor.hpp              # the tensor class (header-only)
-├── main.cpp                # interactive CLI calculator
-├── tests/
-│   └── test_tensor.cpp     # unit tests
-└── .github/workflows/
-    └── ci.yml              # builds + runs tests on Linux and macOS
-```
-
-## Ideas for later
-
-Pull requests and issues are welcome. Some things that would be nice to have:
-
-- General broadcasting (NumPy-style)
-- Views instead of copies for `reshape`
-- Matrix multiply for higher-rank tensors
-- Reductions along an axis (`sum(axis)`, `mean(axis)`)
-- `zeros`, `ones` and `eye` helpers
-
-## License
 
 This project is licensed under the MIT License.
