@@ -1,5 +1,6 @@
 # Tensor-calculator-cpp
 
+<<<<<<< Updated upstream
 A small N-dimensional tensor library and interactive calculator written in modern C++ (C++17)
 
 ## Features
@@ -93,25 +94,20 @@ Result:
 
 `Tensor.hpp` is header-only — just include it from wherever it lives
 relative to your source file:
+=======
+A small, header-only N-dimensional tensor library written in modern C++ (C++17), plus an interactive command-line calculator built on top of it. No dependencies, just drop `Tensor.hpp` into your project.
+>>>>>>> Stashed changes
 
 ```cpp
-#include "Tensor.hpp"   // path relative to this .cpp, e.g. ./Tensor.hpp
+Tensor<> a({2, 2}, {1, 2, 3, 4});
+Tensor<> b({2, 2}, {5, 6, 7, 8});
 
-Tensor a({2, 2}, {1, 2, 3, 4});
-Tensor b({2, 2}, {5, 6, 7, 8});
-
-Tensor sum = a + b;
-Tensor product = a.matmul(b);
-Tensor t = a.transpose();
-
-a += b;              // compound assignment
-Tensor neg = -a;      // unary minus
-bool same = (a == b); // element-wise equality
-
-sum.print();
-std::cout << product << std::endl;   // operator<< works too
+std::cout << a.matmul(b) << std::endl;
+// [[19.0000, 22.0000],
+//  [43.0000, 50.0000]]
 ```
 
+<<<<<<< Updated upstream
 Compile any program that includes it the normal way:
 
 ```bash
@@ -124,3 +120,5 @@ or on your include path (see [Project structure](#project-structure)).
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE)
+=======
+>>>>>>> Stashed changes
