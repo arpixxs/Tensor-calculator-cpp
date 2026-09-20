@@ -1,7 +1,7 @@
 # build output
 build/
-/tensor-calculator
-/tensor-calculator.exe
+/tensor-library
+/tensor-library.exe
 /test_tensor
 /test_tensor.exe
 *.o
