@@ -215,5 +215,6 @@ s = s + x;            // this is fine, it just makes a new tensor
 - **`T` must be a number type** (checked at compile time). `bool` isn't supported.
 - Integer overflow isn't checked.
 
+##license
 
 This project is licensed under the MIT License.
